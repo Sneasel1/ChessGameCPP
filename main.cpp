@@ -164,48 +164,39 @@ bool isKingInCheck(std::string color) {
     return false;
 }
 
-bool isCheckmate(std::string color) {
-    // If the king is not in check, it can't be checkmate
-    if (!isKingInCheck(color)) {
+bool isCheckmate(std::string currentPlayer) {
+    // Check if the current player's king is in check
+    if (!isKingInCheck(currentPlayer)) {
         return false;
     }
 
-    // Check if there is any legal move that would get the king out of check
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            if (chessBoard[i][j].color == color) {
-                for (int k = 0; k < 8; k++) {
-                    for (int l = 0; l < 8; l++) {
+    // Iterate over all squares of the board
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            // Get the piece on the square
+            ChessPiece piece = chessBoard[i][j];
+
+            // If the piece belongs to the current player, check if it has any valid moves
+            if (piece.color == currentPlayer) {
+                for (int k = 0; k < 8; ++k) {
+                    for (int l = 0; l < 8; ++l) {
                         Move move;
                         move.srcRow = i;
-                        #include "move.h" // Include the header file for the move struct
+                        move.srcCol = j;
+                        move.destRow = k;
+                        move.destCol = l;
 
-                        bool isValidMove(Move move); // Declare the missing function isValidMove
-
-                        // ...
-
-                                                move.srcCol = j;
-                                                move.destRow = k;
-                                                move.destCol = l;
-                                                if (isValidMove(move)) { // Call the isValidMove function
-                                                    // Make the move and check if the king is still in check
-                                                    ChessPiece temp = chessBoard[k][l];
-                                                    chessBoard[k][l] = chessBoard[i][j];
-                                                    chessBoard[i][j].type = "Empty";
-                                                    bool check = isKingInCheck(color);
-                                                    chessBoard[i][j] = chessBoard[k][l];
-                                                    chessBoard[k][l] = temp;
-                                                    if (!check) {
-                                                        return false;
-                                                    }
-                                                }
+                        // If the piece has a valid move, then it's not checkmate
+                        if (isValidMove(move, currentPlayer)) {
+                            return false;
+                        }
                     }
                 }
             }
         }
     }
 
-    // If no legal move gets the king out of check, it's checkmate
+    // If no valid moves are found, then it's checkmate
     return true;
 }
 
